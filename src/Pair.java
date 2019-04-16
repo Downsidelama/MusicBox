@@ -15,4 +15,9 @@ class Pair<T1, T2> {
 	T1 getP1() {
 		return p1;
 	}
+
+	@Override
+	public String toString() {
+		return "(" + p1.toString() + ":" + p2.toString() + ")";
+	}
 }

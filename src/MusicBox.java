@@ -11,6 +11,7 @@ public class MusicBox {
     private Map<String, Music> musicMap;
     private List<ClientHandler> clients;
     private ExecutorService executorService;
+    private List<MusicPlayer> musicPlayers;
 
     public static void main(String... strings) {
         new MusicBox();
@@ -20,6 +21,7 @@ public class MusicBox {
         musicMap = new HashMap<>();
         executorService = Executors.newCachedThreadPool();
         clients = new ArrayList<>();
+        musicPlayers = new ArrayList<>();
         try (ServerSocket ss = new ServerSocket(40000)) {
             for (; ; ) {
                 acceptNewClient(ss);
@@ -30,82 +32,8 @@ public class MusicBox {
     }
 
     private void acceptNewClient(ServerSocket ss) throws IOException {
-        ClientHandler musicClient = new ClientHandler(ss.accept(), musicMap);
+        ClientHandler musicClient = new ClientHandler(ss.accept(), musicMap, musicPlayers);
         clients.add(musicClient);
         this.executorService.submit(musicClient);
-    }
-}
-
-class ClientHandler implements Runnable, AutoCloseable {
-
-    private Socket socket;
-    private Scanner input;
-    private PrintWriter output;
-    private boolean running;
-    private Map<String, Music> musicMap;
-
-    ClientHandler(Socket s, Map<String, Music> musicMap) throws IOException {
-        super();
-        this.musicMap = musicMap;
-        this.socket = s;
-        this.input = new Scanner(s.getInputStream());
-        this.output = new PrintWriter(s.getOutputStream());
-        this.running = true;
-    }
-
-    @Override
-    public void run() {
-        while (this.running && this.input.hasNextLine()) {
-            String input = this.input.nextLine();
-
-            if (input.startsWith("addlyrics")) {
-                String title = input.replace("addlyrics", "").trim();
-                String lyrics = this.input.nextLine();
-                addLyrics(title, lyrics);
-            } else if (input.startsWith("add")) {
-                String title = input.replace("add", "").trim();
-                String notes = this.input.nextLine();
-                addMusic(title, notes);
-            } else {
-                System.out.println(input);
-            }
-        }
-        try {
-            this.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    private void addMusic(String title, String notes) {
-        Music music = this.musicMap.getOrDefault(title, new Music());
-        String[] splittedNotes = notes.split(" ");
-        if (splittedNotes.length % 2 == 0) {
-            music.clearNotes();
-            for (int i = 0; i < splittedNotes.length; i += 2) {
-                music.addNote(splittedNotes[i], splittedNotes[i + 1]);
-            }
-            System.out.println(music);
-            this.musicMap.put(title, music);
-        } else {
-            System.out.println("Bad notes format!");
-        }
-    }
-
-    private void addLyrics(String title, String lyrics) {
-        Music music = this.musicMap.getOrDefault(title, new Music());
-        music.addLyrics(lyrics);
-    }
-
-    @Override
-    public void close() throws Exception {
-        this.input.close();
-        this.output.close();
-        this.socket.close();
-    }
-
-    void dropClient() {
-        this.running = false;
     }
 }

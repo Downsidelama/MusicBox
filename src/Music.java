@@ -1,12 +1,14 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Music {
     private final List<Pair<String, String>> notes;
-    private String lyrics = "";
+    private List<String> lyrics;
 
     Music() {
         this.notes = new ArrayList<>();
+        this.lyrics = new ArrayList<>();
     }
 
     void addNote(String note, String length) {
@@ -17,7 +19,7 @@ public class Music {
 
     void addLyrics(String lyrics) {
         synchronized (this) {
-            this.lyrics = lyrics;
+            this.lyrics = Arrays.asList(lyrics.split(" "));
         }
     }
 
@@ -34,5 +36,13 @@ public class Music {
 
     void clearNotes() {
         this.notes.clear();
+    }
+
+    List<Pair<String, String>> getNotes() {
+        return notes;
+    }
+
+    String getLyricsAt(int lyricsIndex) {
+        return this.lyrics.size() > lyricsIndex ? this.lyrics.get(lyricsIndex) : "???";
     }
 }
