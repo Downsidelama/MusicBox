@@ -39,7 +39,7 @@ public class MidiConverter {
             throw new IllegalArgumentException("Invalid music note!");
         }
 
-        value += baseNotes.get(Character.toString(noteParts[0].charAt(0)));
+        value += baseNotes.get(Character.toString(noteParts[0].charAt(0)).toUpperCase());
         if (noteParts[0].length() > 1) {
             if (noteParts[0].charAt(1) == '#') {
                 value += hashmark;
