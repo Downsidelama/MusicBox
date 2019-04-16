@@ -11,12 +11,12 @@ public class MidiConverter {
     private int octave = 12;
     private int smallB = -1;
     private int hashmark = 1;
-    private Random rand;
+    Random rand;
 
     MidiConverter() {
         baseNotes = new HashMap<String, Integer>() {{
             put("C", 60);
-            put("C#", 61);
+            put("C#/Db", 61);
             put("D", 62);
             put("D#/Eb", 63);
             put("E", 64);
@@ -25,7 +25,7 @@ public class MidiConverter {
             put("G", 67);
             put("G#/Ab", 68);
             put("A", 69);
-            put("Bb", 70);
+            put("A#/Bb", 70);
             put("B", 71);
         }};
         rand = new Random();
@@ -59,6 +59,7 @@ public class MidiConverter {
      *
      * @param value        Integer value of the note.
      * @param preferHigher True to prefer 'is notes, false to not.
+     *
      * @return String representation of the note.
      */
     String convertMidiValueToNote(int value, boolean preferHigher) {
@@ -79,5 +80,21 @@ public class MidiConverter {
         if (octave != 0)
             midi += String.format("/%d", octave);
         return midi;
+    }
+
+    /**
+     * Converts Midi values to notes, randomly choosing representation at semitones.
+     *
+     * @param value Integer value of the note.
+     *
+     * @return String representation of the note.
+     */
+    String convertMidiValueToNote(int value) {
+        return convertMidiValueToNote(value, 0 == rand.nextInt(2));
+    }
+
+    String transponseNote(String note, int transponse) {
+        int midiNote = convertNoteToMidiValue(note);
+        return convertMidiValueToNote(midiNote + transponse, note.contains("#"));
     }
 }
