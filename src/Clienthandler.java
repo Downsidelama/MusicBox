@@ -84,7 +84,6 @@ class ClientHandler implements Runnable, AutoCloseable {
             for (int i = 0; i < splittedNotes.length; i += 2) {
                 music.addNote(splittedNotes[i], splittedNotes[i + 1]);
             }
-            System.out.println(music);
             this.musicMap.put(title, music);
         } else {
             System.out.println("Bad notes format!");
@@ -94,7 +93,6 @@ class ClientHandler implements Runnable, AutoCloseable {
     private void addLyrics(String title, String lyrics) {
         Music music = this.musicMap.getOrDefault(title, new Music());
         music.addLyrics(lyrics);
-        System.out.println(music);
     }
 
     private void play(int tempo, int transponse, String title) {
